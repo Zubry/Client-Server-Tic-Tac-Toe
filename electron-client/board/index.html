@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Tic-Tac-Toe</title>
+  </head>
+  <body>
+    <div>
+      <div class="ticTacToe">
+        <div class="column">
+          <span class="square" data-x="0" data-y="0"> </span>
+          <span class="square" data-x="1" data-y="0"> </span>
+          <span class="square" data-x="2" data-y="0"> </span>
+        </div>
+        <div class="column">
+          <span class="square" data-x="0" data-y="1"> </span>
+          <span class="square" data-x="1" data-y="1"> </span>
+          <span class="square" data-x="2" data-y="1"> </span>
+        </div>
+        <div class="column">
+          <span class="square" data-x="0" data-y="2"> </span>
+          <span class="square" data-x="1" data-y="2"> </span>
+          <span class="square" data-x="2" data-y="2"> </span>
+        </div>
+      </div>
+    </div>
+  </body>
+  <style>
+    * {
+      box-sizing : border-box;
+    }
+
+    html, body {
+      height : 100%;
+    }
+
+    body {
+      display         : flex;
+      align-items     : center;
+      justify-content : center;
+      vertical-align  : center;
+      flex-wrap       : wrap;
+      align-content   : center;
+
+      font-family     : 'Open Sans', sans-serif;
+      background      : linear-gradient(top, #222, #333);
+    }
+
+    .ticTacToe {
+      display         : flex;
+      justify-content : space-between;
+
+      width   : 400px;
+      height  : 400px;
+      padding : 5px;
+      border  : 1px solid #e4e4e4;
+    }
+
+    .column {
+      display         : flex;
+      flex-direction  : column;
+      justify-content : space-between;
+    }
+
+    .square {
+      display : block;
+      width   : 125px;
+      height  : 125px;
+      border  : 1px solid #e4e4e4;
+
+      color       : #e4e4e4;
+      font-size   : 5em;
+      font-weight : 100;
+      text-align  : center;
+      padding     : 20px;
+    }
+  </style>
+  <script>
+    function apply(board) {
+      [].slice.call(document.querySelectorAll('.square'))
+        .forEach((c, i) => c.textContent = board[Math.floor(i / 3)][i % 3]);
+    }
+
+    var exec = require('child_process').exec;
+
+    function game() {
+      exec('server/bin/create-game', function(_, out, err) {
+        console.log(out, err);
+        apply(JSON.parse(out).board);
+      });
+
+      [].slice.call(document.querySelectorAll('.square'))
+        .forEach((c) => {
+          c.addEventListener('click', function(e) {
+            const x = this.dataset.x;
+            const y = this.dataset.y;
+
+            exec('server/bin/add-tile ' + x + ' ' + y, function(_, out, err) {
+              console.log(_, out, err);
+              if (err) {
+                alert(JSON.parse(err).error);
+              }
+
+              out = JSON.parse(out);
+
+              apply(out.board);
+
+              if (out.winner && out.winner !== 'draw') {
+                alert('Congrats, ' + out.winner + '!');
+
+                game();
+              }
+
+              if (out.winner && out.winner === 'draw') {
+                alert('It\'s a draw :(');
+
+                game();
+              }
+            });
+          });
+        });
+    }
+
+    game();
+  </script>
+</html>
