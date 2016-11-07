@@ -63,7 +63,7 @@ bool draw(json board) {
 
 int main( int argc, char *argv[] ) {
   if (argc < 3) {
-    std::cerr << "{ error: \"Missing move\" }" << std::endl;
+    std::cerr << "{ \"error\": \"Missing move\" }" << std::endl;
     return 1;
   }
 
@@ -75,7 +75,7 @@ int main( int argc, char *argv[] ) {
   std::string tile = game["board"][y][x];
 
   if (tile != " ") {
-    std::cerr << "{ error: \"Tile already placed\" }" << std::endl;
+    std::cerr << "{ \"error\": \"Tile already placed\" }" << std::endl;
     return 1;
   }
 
@@ -90,7 +90,7 @@ int main( int argc, char *argv[] ) {
 
   if (draw(game)) {
     game["winner"] = "draw";
-    std::cerr << "{ error: \"Game over!\" }" << std::endl;
+    std::cerr << "{ \"error\": \"Game over!\" }" << std::endl;
   }
 
   write_database(game);
